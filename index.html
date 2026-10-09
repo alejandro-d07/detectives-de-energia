@@ -169,6 +169,19 @@ html{touch-action:manipulation;-webkit-text-size-adjust:100%}
 @media (max-width:900px) and (orientation:portrait) and (max-width:600px){
   body.playing:not(.rotate-dismissed) .rotate{display:flex}
 }
+.chip .ls{display:none}
+.chip svg{width:20px;height:20px;display:block}
+@media (max-width:900px), (pointer:coarse) and (max-height:820px){
+  .chip .lf{display:none}
+  .chip .ls{display:inline-flex;align-items:center}
+  .chip.icon{padding:6px 10px;min-width:44px}
+}
+@media (max-width:600px){
+  header{flex-wrap:wrap;row-gap:8px;padding:8px 12px}
+  .brand{flex:1 1 100%;min-width:0}
+  .tools{flex:1 1 100%;justify-content:space-between}
+  .tools .chip{flex:1 1 auto}
+}
 .rotate{position:absolute;left:50%;top:64px;transform:translateX(-50%);z-index:5;align-items:center;gap:10px;background:var(--ink);color:#fff;font-weight:600;font-size:14px;padding:8px 8px 8px 14px;border-radius:999px;width:max-content;max-width:calc(100% - 24px)}
 .rotate button{background:#fff;color:var(--ink);border:0;border-radius:999px;font-weight:700;padding:6px 12px;min-height:36px}
 </style>
@@ -183,10 +196,10 @@ html{touch-action:manipulation;-webkit-text-size-adjust:100%}
       </div>
     </div>
     <div class="tools">
-      <button class="chip" id="lang-es" type="button" aria-pressed="true">Español</button>
-      <button class="chip" id="lang-en" type="button" aria-pressed="false">English</button>
-      <button class="chip" id="snd" type="button" aria-pressed="true"></button>
-      <button class="chip hidden" id="fs" type="button"></button>
+      <button class="chip" id="lang-es" type="button" aria-pressed="true" aria-label="Español"><span class="lf">Español</span><span class="ls">ES</span></button>
+      <button class="chip" id="lang-en" type="button" aria-pressed="false" aria-label="English"><span class="lf">English</span><span class="ls">EN</span></button>
+      <button class="chip icon" id="snd" type="button" aria-pressed="true"></button>
+      <button class="chip icon hidden" id="fs" type="button"></button>
       <button class="chip only-compact" id="open-board" type="button"></button>
     </div>
   </header>
@@ -817,8 +830,16 @@ function applyLang(){
   $('reset').textContent=t('reset'); $('t-reset-q').textContent=t('resetQ'); $('reset-yes').textContent=t('yes'); $('reset-no').textContent=t('no');
   $('again').textContent=t('again'); $('next').textContent=t('next');
   $('open-board').textContent=t('boardBtn'); $('end-board').textContent=t('boardBtn'); $('close-board').textContent=t('close'); $('t-rotate').textContent=t('rotate');
-  $('fs').textContent = (typeof inFS==='function' && inFS()) ? t('fsOff') : t('fsOn');
-  $('snd').textContent=sound?t('on'):t('off'); $('snd').setAttribute('aria-pressed',sound);
+  const fsLabel = (typeof inFS==='function' && inFS()) ? t('fsOff') : t('fsOn');
+  const fsIcon = (typeof inFS==='function' && inFS())
+    ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  $('fs').innerHTML=`<span class="lf">${fsLabel}</span><span class="ls">${fsIcon}</span>`; $('fs').setAttribute('aria-label',fsLabel);
+  const spk = sound
+    ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
+    : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 9l5 6M21 9l-5 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+  $('snd').innerHTML=`<span class="lf">${sound?t('on'):t('off')}</span><span class="ls">${spk}</span>`;
+  $('snd').setAttribute('aria-label', sound?t('on'):t('off')); $('snd').setAttribute('aria-pressed',sound);
   renderBoard(); renderPrize(); render();
   if(S.screen==='end'){ writeEndSub(); $('end-save').textContent=t('saved'); showMedal(); }
 }
